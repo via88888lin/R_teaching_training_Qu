@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 住院醫師滿意度問卷</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        .likert-btn.selected {
+            background-color: #059669; /* emerald-600 */
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: scale(1.1);
+            z-index: 10;
+        }
+        .likert-btn.selected::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            width: 6px;
+            height: 6px;
+            background-color: #059669;
+            border-radius: 50%;
+            animation: bounce 1s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #059669;
+            cursor: pointer;
+            box-shadow: 0 0 2px 0 #555;
+            transition: background .3s ease-in-out;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #047857;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 pb-24 selection:bg-emerald-100 selection:text-emerald-800">
+
+    <!-- Progress Bar -->
+    <div class="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200 h-16 flex items-center px-4 md:px-8 justify-between shadow-sm transition-all duration-300">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">R</div>
+            <span class="font-bold text-slate-800 tracking-wide text-sm md:text-base truncate hidden sm:block">
+                2025 住院醫師滿意度問卷
+            </span>
+        </div>
+        <div class="flex items-center gap-4 w-1/2 md:w-1/3 lg:w-1/4">
+            <div class="flex-1 flex flex-col gap-1">
+                <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <span>Progress</span>
+                    <span id="progressText" class="text-emerald-600">0%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div id="progressBar" class="h-full bg-emerald-500 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="surveyContainer" class="max-w-4xl mx-auto pt-28 px-4 sm:px-6">
+        
+        <!-- Header Card -->
+        <div class="bg-gradient-to-br from-emerald-800 to-teal-900 rounded-3xl p-8 md:p-12 mb-10 text-white shadow-xl shadow-emerald-900/20 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 -mr-16 -mt-16 w-80 h-80 bg-white opacity-5 rounded-full blur-3xl group-hover:opacity-10 transition-opacity duration-700"></div>
+            <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-teal-400 opacity-10 rounded-full blur-3xl"></div>
+            
+            <div class="relative z-10">
+                <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-emerald-100 mb-6 border border-white/10">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    2025 年度調查
+                </div>
+                <h1 class="text-3xl md:text-5xl font-bold mb-6 tracking-tight leading-tight">
+                    住院醫師整體<br class="hidden md:block" />教學訓練滿意度問卷
+                </h1>
+                <p class="opacity-90 leading-relaxed max-w-2xl text-lg md:text-xl font-light text-emerald-50">
+                    為提升本院教學品質與學習環境，懇請撥冗 3-5 分鐘填寫此份問卷（採匿名制）。您的寶貴意見將是我們優化制度與改進的重要依據。
+                </p>
+                <div class="flex items-center gap-4 mt-8 text-sm font-medium text-emerald-200">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                        匿名填寫
+                    </div>
+                    <div class="w-1 h-1 rounded-full bg-emerald-200/50"></div>
+                    <div>約需 3-5 分鐘</div>
+                </div>
+            </div>
+        </div>
+
+        <form id="surveyForm">
+            
+            <!-- Section 1: Basic Info -->
+            <div class="bg-white rounded-3xl p-6 md:p-10 shadow-sm mb-8 border border-slate-100">
+                <div class="flex items-start md:items-center gap-4 mb-8 border-b border-slate-100 pb-6">
+                    <div class="p-3.5 bg-gradient-to-br from-emerald-100 to-teal-50 rounded-2xl text-emerald-700 shadow-sm">
+                        <i data-lucide="user" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800 tracking-tight">基本資料</h2>
+                        <p class="text-sm text-slate-500 mt-1.5 font-medium">請填寫您目前的服務單位與職級</p>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 md:gap-12">
+                    <div class="space-y-4">
+                        <label class="block text-sm font-bold text-slate-700">
+                            科部 <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative group">
+                            <select id="department" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none appearance-none transition-all cursor-pointer font-medium text-slate-700 group-hover:bg-slate-100" required>
+                                <option value="" disabled selected>請選擇科部</option>
+                                <!-- JS will populate this -->
+                            </select>
+                            <i data-lucide="chevron-right" class="absolute right-4 top-4 text-slate-400 rotate-90 pointer-events-none w-5 h-5"></i>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <label class="block text-sm font-bold text-slate-700">
+                            擔任職級 <span class="text-rose-500">*</span>
+                        </label>
+                        <div id="rankContainer" class="grid grid-cols-2 gap-3">
+                            <!-- JS will populate buttons -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Helper Function to create Likert Sections -->
+            <div id="likertSections">
+                <!-- JS will inject sections here -->
+            </div>
+
+            <!-- Section 6: Overall -->
+            <div class="bg-white rounded-3xl p-6 md:p-10 shadow-sm mb-10 border border-slate-100">
+                <div class="flex items-start md:items-center gap-4 mb-8 border-b border-slate-100 pb-6">
+                    <div class="p-3.5 bg-gradient-to-br from-emerald-100 to-teal-50 rounded-2xl text-emerald-700 shadow-sm">
+                        <i data-lucide="clipboard-check" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800 tracking-tight">整體評估與雙向回饋</h2>
+                        <p class="text-sm text-slate-500 mt-1.5 font-medium">回饋是解決問題的關鍵</p>
+                    </div>
+                </div>
+
+                <!-- Q18 -->
+                <div class="mb-12">
+                    <label class="block font-bold text-lg text-slate-800 mb-6">
+                        18. 回顧這一年，您覺得自己在「臨床核心能力」與「專業素養」上的成長幅度為何？ <span class="text-rose-500">*</span>
+                    </label>
+                    <div id="q18Container" class="grid md:grid-cols-5 gap-3">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+
+                <!-- Q19 NPS -->
+                <div class="mb-12 p-8 bg-slate-50 rounded-2xl border border-slate-100">
+                    <label class="block font-bold text-lg text-slate-800 mb-8 text-center">
+                        19. 如果要推薦學弟妹來本院/本科受訓，您的推薦程度是？ (1-10分) <span class="text-rose-500">*</span>
+                        <div class="text-sm text-slate-500 mt-2 font-normal">(1分極不推薦 ~ 10分極力推薦)</div>
+                    </label>
+                    
+                    <div class="relative mb-8 px-2">
+                        <input type="range" id="q19" min="1" max="10" step="1" value="5" class="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                        <div class="flex justify-between text-xs text-slate-400 font-bold px-1 mt-4">
+                            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="inline-flex flex-col items-center">
+                           <span id="q19Display" class="text-4xl font-bold text-amber-500 transition-colors duration-300">5</span>
+                           <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Score</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q20 Open Ended -->
+                <div class="mb-8">
+                    <label class="block font-bold text-lg text-slate-800 mb-4">
+                        20. 針對「教學內容」、「行政流程」或「福利制度」，您最希望立即改善的一件事是什麼？ <span class="text-rose-500">*</span>
+                    </label>
+                    <textarea id="q20" rows="4" class="w-full p-5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all resize-none text-slate-700 leading-relaxed" placeholder="請輸入您的具體建議..." required></textarea>
+                </div>
+
+                <!-- Q21 Recommendation -->
+                <div class="mb-10 border-t border-slate-100 pt-8 mt-8">
+                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2 text-lg">
+                        <div class="p-2 bg-emerald-100 rounded-lg text-emerald-600">
+                            <i data-lucide="building-2" class="w-5 h-5"></i>
+                        </div>
+                        21. 優良教師推薦
+                    </h3>
+                    <p class="text-sm text-slate-500 mb-6 bg-slate-50 p-4 rounded-lg inline-block">
+                        請推薦一位對您影響最深或教學最熱忱的「臨床教師」或「同儕」。
+                    </p>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="md:col-span-1">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">姓名</label>
+                            <input type="text" id="q21_name" placeholder="姓名" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">推薦原因</label>
+                            <input type="text" id="q21_reason" placeholder="簡單描述推薦原因" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q22 Contact -->
+                <div class="mb-2 border-t border-slate-100 pt-8">
+                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2 text-lg">
+                        <div class="p-2 bg-emerald-100 rounded-lg text-emerald-600">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                        </div>
+                        22. 雙向回饋機制 (自由選填)
+                    </h3>
+                    <p class="text-sm text-slate-500 mb-6">若您願意讓我們針對您的建議(第20題)進行後續深入了解問題狀況或回覆改善進度追蹤，強烈請您留下聯絡方式。</p>
+                    <input type="text" id="q22" placeholder="姓名 / Email / 分機" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-center pb-20 sticky bottom-4 z-30 pointer-events-none">
+                <button type="submit" id="submitBtn" disabled class="pointer-events-auto flex items-center gap-3 px-16 py-4 rounded-full text-lg font-bold shadow-xl shadow-emerald-900/10 transition-all duration-300 transform bg-slate-300 text-slate-500 cursor-not-allowed scale-95 opacity-80">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                    <span id="submitBtnText">提交問卷</span>
+                </button>
+            </div>
+            
+            <div class="text-center text-slate-400 text-sm pb-10 mt-[-40px]">
+                <p class="font-medium">教學部 住院醫師組</p>
+                <p class="text-xs opacity-60 mt-1">© 2025 Residency Education Satisfaction Survey</p>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Success Message (Hidden by default) -->
+    <div id="successMessage" class="hidden min-h-screen bg-emerald-50/50 flex items-center justify-center p-4 font-sans fixed top-0 left-0 w-full z-50">
+        <div class="bg-white max-w-lg w-full p-10 rounded-3xl shadow-2xl shadow-emerald-100/50 text-center border border-emerald-100 relative overflow-hidden animate-fade-in">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
+            <div class="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
+                <i data-lucide="check-circle-2" class="w-12 h-12 text-emerald-600"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-slate-800 mb-4 tracking-tight">感謝您的回饋！</h2>
+            <p class="text-slate-600 mb-10 leading-relaxed text-lg">
+                您的意見是我們推動<span class="font-bold text-emerald-700 mx-1">學習型健康組織 (LHS)</span>進步的動力。<br/>
+                我們將會仔細研讀您的建議並持續改善教學品質。
+            </p>
+            <button onclick="window.location.reload()" class="inline-flex items-center justify-center px-8 py-3 text-base font-bold text-emerald-700 bg-emerald-50 rounded-full hover:bg-emerald-100 transition-colors duration-300 cursor-pointer">
+                返回問卷首頁
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Data & Config ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQEa2vFg-XKjahWpc_aCvYP8YLlUdA6opPhI_Ql9vF_eSCLCz3ROZCiqgAbdoYMWBb/exec";
+        
+        const departments = [
+            "內科部", "外科部", "婦產部", "兒科部", "骨科部", "急診醫學部", 
+            "家庭醫學部", "放射診斷科", "麻醉部", "放射腫瘤部", "復健部", 
+            "加護醫學部", "眼科部", "耳鼻喉科部", "精神醫學部", "臨床病理部", 
+            "解剖病理部", "中醫部", "齒顎矯正科", "口腔顎面外科", "牙周病科", 
+            "牙髓病科", "贋復科", "家庭牙科", "牙醫一般科", "其他"
+        ];
+        const ranks = ["牙科PGY", "R1", "R2", "R3", "R4以上", "研究員", "總醫師 (CR)"];
+        
+        const likertQuestions = [
+            {
+                section: "教學品質與勝任能力",
+                subtitle: "強調「觀察」與「回饋」的具體行為",
+                icon: "stethoscope",
+                questions: [
+                    { id: "q1", label: "學習目標", text: "1. 科部/主治醫師能清楚說明各階段的訓練里程碑 (Milestones) 及我應具備的核心能力。" },
+                    { id: "q2", label: "直接觀察", text: "2. 在執行臨床處置或侵入性治療時，臨床教師會進行「直接觀察」並給予指導。" },
+                    { id: "q3", label: "具體回饋", text: "3. 臨床教師能針對我的表現給予具體、建設性的回饋（不僅是說「做得好」或「再加油」）。" },
+                    { id: "q4", label: "授權層級", text: "4. 在執行困難照護或各項 EPAs (可信任專業活動) 時，我能獲得與我能力相符的授權與監督。" },
+                    { id: "q5", label: "評估機制", text: "5. 科內的評估機制（如 CCC、DOPS、Mini-CEX）能真實反映我的能力落差，而非僅是形式上的簽核。" },
+                    { id: "q6", label: "資深指導", text: "6. 資深住院醫師/Fellow 對學弟妹的臨床指導具備熱忱，且內容切合實務需求。" }
+                ]
+            },
+            {
+                section: "全人照護與跨領域合作",
+                subtitle: "強調「非醫師」的合作體驗",
+                icon: "heart-handshake",
+                questions: [
+                    { id: "q7", label: "全人醫療", text: "7. 醫療團隊常規討論病人的「身、心、靈、社」需求，並融入醫病共享決策 (SDM) 的觀念。" },
+                    { id: "q8", label: "跨領域合作", text: "8. 我有機會與護理師、藥師、社工等跨職類人員進行實質的溝通合作 (IPP)，且過程受到尊重。" },
+                    { id: "q9", label: "病歷寫作", text: "9. 教師曾針對我的病歷或報告內容進行「修改或邏輯討論」，有效提升我的臨床思維。" }
+                ]
+            },
+            {
+                section: "職場韌性、安全與勞動權益",
+                subtitle: "包含心理安全感與性別友善",
+                icon: "shield-check",
+                questions: [
+                    { id: "q10", label: "工時平衡", text: "10. 目前的輪班與工時安排（含值班後 PM Off 落實情形），能讓我保有合理的休息時間與生活品質。" },
+                    { id: "q11", label: "心理安全", text: "11. 面對醫療不良事件或錯誤時，科內採取「非懲罰性」態度，鼓勵通報並從錯誤中學習。" },
+                    { id: "q12", label: "職場友善", text: "12. 醫院對於職場暴力、霸凌及性騷擾防治的機制完善，讓我感到安全與被支持。" },
+                    { id: "q13", label: "導師制度", text: "13. 我的導師會主動關懷我的身心壓力、適應狀況或職涯發展。" },
+                    { id: "q14", label: "行政效率", text: "14. 相關行政單位（如教學部、人資室）的辦事效率與態度，能有效協助我解決問題。" }
+                ]
+            },
+            {
+                section: "智慧醫療與學習資源",
+                subtitle: "硬體滿意度、效率與輔助評估",
+                icon: "cpu",
+                questions: [
+                    { id: "q15", label: "資訊系統", text: "15. 醫院的醫療資訊系統 (HIS) 或 AI 輔助工具，操作介面友善且能有效提升我的照護效率。" },
+                    { id: "q16", label: "實證資源", text: "16. 我能方便地取得臨床決策輔助資源（如 UpToDate、線上藥典、圖書館資料庫）。" },
+                    { id: "q17", label: "模擬訓練", text: "17. 臨床技能中心 (OSCE/Simulation) 的設備與課程，能滿足我在接觸病人前的技能準備需求。" }
+                ]
+            }
+        ];
+
+        // State Object
+        let formData = {
+            department: '',
+            rank: '',
+            q1: null, q2: null, q3: null, q4: null, q5: null, q6: null,
+            q7: null, q8: null, q9: null,
+            q10: null, q11: null, q12: null, q13: null, q14: null,
+            q15: null, q16: null, q17: null,
+            q18: '',
+            q19: 5,
+            q20: '',
+            q21_name: '', q21_reason: '',
+            q22: ''
+        };
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initForm();
+            updateProgress();
+        });
+
+        function initForm() {
+            // Populate Departments
+            const deptSelect = document.getElementById('department');
+            departments.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept;
+                option.textContent = dept;
+                deptSelect.appendChild(option);
+            });
+            deptSelect.addEventListener('change', (e) => updateState('department', e.target.value));
+
+            // Populate Ranks
+            const rankContainer = document.getElementById('rankContainer');
+            ranks.forEach(rank => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'rank-btn p-3 text-sm rounded-xl border font-medium transition-all duration-200 active:scale-95 bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-emerald-200';
+                btn.textContent = rank;
+                btn.onclick = () => {
+                    document.querySelectorAll('.rank-btn').forEach(b => {
+                        b.className = 'rank-btn p-3 text-sm rounded-xl border font-medium transition-all duration-200 active:scale-95 bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-emerald-200';
+                    });
+                    btn.className = 'rank-btn p-3 text-sm rounded-xl border font-medium transition-all duration-200 active:scale-95 bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-200';
+                    updateState('rank', rank);
+                };
+                rankContainer.appendChild(btn);
+            });
+
+            // Populate Likert Sections
+            const sectionsContainer = document.getElementById('likertSections');
+            likertQuestions.forEach(sec => {
+                const secDiv = document.createElement('div');
+                secDiv.className = 'bg-white rounded-3xl p-6 md:p-10 shadow-sm mb-8 border border-slate-100';
+                
+                let questionsHtml = '';
+                sec.questions.forEach(q => {
+                    questionsHtml += `
+                        <div class="mb-8 p-6 bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+                            <div class="flex flex-col md:flex-row md:items-start gap-4">
+                                <div class="bg-emerald-50 text-emerald-700 font-bold px-3 py-1.5 rounded-lg text-sm whitespace-nowrap self-start">
+                                    ${q.label}
+                                </div>
+                                <div class="flex-1 w-full">
+                                    <p class="text-slate-800 font-medium text-lg mb-6 leading-relaxed">
+                                        ${q.text} <span class="text-rose-500 ml-1 select-none">*</span>
+                                    </p>
+                                    <div class="flex flex-col space-y-3">
+                                        <div class="flex justify-between items-center px-1">
+                                            <span class="text-xs font-bold text-slate-400">非常不同意</span>
+                                            <span class="text-xs font-bold text-slate-400">非常同意</span>
+                                        </div>
+                                        <div class="flex items-center justify-between gap-2 bg-slate-50 p-2 rounded-full">
+                                            ${[1,2,3,4,5].map(val => `
+                                                <button type="button" class="likert-btn relative w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-lg font-medium transition-all duration-300 text-slate-400 hover:bg-emerald-100 hover:text-emerald-700 hover:scale-105" onclick="handleLikertClick('${q.id}', ${val}, this)">
+                                                    ${val}
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                secDiv.innerHTML = `
+                    <div class="flex items-start md:items-center gap-4 mb-8 border-b border-slate-100 pb-6">
+                        <div class="p-3.5 bg-gradient-to-br from-emerald-100 to-teal-50 rounded-2xl text-emerald-700 shadow-sm">
+                            <i data-lucide="${sec.icon}" class="w-7 h-7"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800 tracking-tight">${sec.section}</h2>
+                            <p class="text-sm text-slate-500 mt-1.5 font-medium">${sec.subtitle}</p>
+                        </div>
+                    </div>
+                    ${questionsHtml}
+                `;
+                sectionsContainer.appendChild(secDiv);
+            });
+
+            // Populate Q18
+            const q18Container = document.getElementById('q18Container');
+            const q18Options = ['成長幅度很大 (Top 10%)', '有顯著成長', '普通', '成長有限', '無成長'];
+            q18Options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'q18-btn p-4 text-sm font-medium rounded-xl border text-center transition-all duration-200 active:scale-95 bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-emerald-200';
+                btn.textContent = opt;
+                btn.onclick = () => {
+                    document.querySelectorAll('.q18-btn').forEach(b => {
+                        b.className = 'q18-btn p-4 text-sm font-medium rounded-xl border text-center transition-all duration-200 active:scale-95 bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-emerald-200';
+                    });
+                    btn.className = 'q18-btn p-4 text-sm font-medium rounded-xl border text-center transition-all duration-200 active:scale-95 bg-emerald-600 text-white border-emerald-600 shadow-md ring-2 ring-emerald-100';
+                    updateState('q18', opt);
+                };
+                q18Container.appendChild(btn);
+            });
+
+            // Q19 NPS Listener
+            const q19Input = document.getElementById('q19');
+            const q19Display = document.getElementById('q19Display');
+            q19Input.addEventListener('input', (e) => {
+                const val = parseInt(e.target.value);
+                updateState('q19', val);
+                q19Display.textContent = val;
+                
+                if (val >= 9) {
+                    q19Display.className = 'text-4xl font-bold text-emerald-600 transition-colors duration-300';
+                } else if (val >= 7) {
+                    q19Display.className = 'text-4xl font-bold text-teal-500 transition-colors duration-300';
+                } else {
+                    q19Display.className = 'text-4xl font-bold text-amber-500 transition-colors duration-300';
+                }
+            });
+
+            // Text Inputs
+            document.getElementById('q20').addEventListener('input', (e) => updateState('q20', e.target.value));
+            document.getElementById('q21_name').addEventListener('input', (e) => updateState('q21_name', e.target.value));
+            document.getElementById('q21_reason').addEventListener('input', (e) => updateState('q21_reason', e.target.value));
+            document.getElementById('q22').addEventListener('input', (e) => updateState('q22', e.target.value));
+
+            // Form Submit
+            document.getElementById('surveyForm').addEventListener('submit', handleSubmit);
+            
+            // Re-run icons for dynamically added elements
+            lucide.createIcons();
+        }
+
+        // --- Logic Functions ---
+
+        function handleLikertClick(questionId, value, btnElement) {
+            updateState(questionId, value);
+            
+            // Visual Update
+            const container = btnElement.parentElement;
+            const buttons = container.querySelectorAll('.likert-btn');
+            buttons.forEach(b => {
+                b.classList.remove('selected', 'bg-emerald-600', 'text-white', 'shadow-lg', 'scale-110', 'ring-4', 'ring-white', 'z-10');
+                b.classList.add('text-slate-400');
+            });
+            
+            btnElement.classList.remove('text-slate-400');
+            btnElement.classList.add('selected'); // See custom CSS
+        }
+
+        function updateState(key, value) {
+            formData[key] = value;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const totalFields = 22;
+            let filled = 0;
+            
+            if (formData.department) filled++;
+            if (formData.rank) filled++;
+            
+            for (let i = 1; i <= 17; i++) {
+                if (formData[`q${i}`]) filled++;
+            }
+            if (formData.q18) filled++;
+            if (formData.q20 && formData.q20.trim() !== '') filled++;
+            
+            // q19 has default, credit immediately if other fields touched (simplified logic from React)
+            if (filled > 0) filled++; 
+
+            const calculated = Math.round((filled / totalFields) * 100);
+            const progress = Math.min(100, calculated);
+            
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const submitBtn = document.getElementById('submitBtn');
+
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${progress}%`;
+            
+            const icon = submitBtn.querySelector('i, svg');
+
+            if (progress === 100) {
+                progressBar.classList.remove('bg-emerald-500');
+                progressBar.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-teal-400');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('bg-slate-300', 'text-slate-500', 'cursor-not-allowed', 'opacity-80', 'scale-95');
+                submitBtn.classList.add('bg-gradient-to-r', 'from-emerald-600', 'to-teal-600', 'text-white', 'hover:shadow-emerald-500/30', 'hover:scale-105', 'active:scale-95');
+                if (icon) icon.classList.add('animate-pulse');
+            } else {
+                progressBar.classList.add('bg-emerald-500');
+                progressBar.classList.remove('bg-gradient-to-r', 'from-emerald-500', 'to-teal-400');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('bg-slate-300', 'text-slate-500', 'cursor-not-allowed', 'opacity-80', 'scale-95');
+                submitBtn.classList.remove('bg-gradient-to-r', 'from-emerald-600', 'to-teal-600', 'text-white', 'hover:shadow-emerald-500/30', 'hover:scale-105', 'active:scale-95');
+                if (icon) icon.classList.remove('animate-pulse');
+            }
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('submitBtnText');
+            const btnIcon = submitBtn.querySelector('i, svg');
+            
+            // Set Loading State
+            submitBtn.disabled = true;
+            btnText.textContent = "提交中...";
+            // Replace icon with spinner
+            let oldIconHtml = '';
+            if (btnIcon) {
+                oldIconHtml = btnIcon.outerHTML;
+                btnIcon.outerHTML = '<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>';
+            }
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                // Show Success
+                window.scrollTo(0, 0);
+                document.getElementById('surveyContainer').style.display = 'none'; // Hide Form
+                document.getElementById('successMessage').classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Submission Error:", error);
+                alert("提交過程中發生錯誤，請檢查網路連線或稍後再試。");
+                // Reset Button
+                submitBtn.disabled = false;
+                btnText.textContent = "提交問卷";
+                if (oldIconHtml) {
+                    const spinner = submitBtn.querySelector('.animate-spin');
+                    if(spinner) spinner.outerHTML = oldIconHtml; // Restore icon
+                    lucide.createIcons();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
